@@ -2,6 +2,7 @@ using UnityEngine;
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Hero : MonoBehaviour
 {
@@ -12,16 +13,19 @@ public class Hero : MonoBehaviour
     public float speed = 30;
     public float rollMult = -45;
     public float pitchMult = 30;
+    public GameObject projectilePrefab;
+    public float projectileSpeed = 40;
 
     [Header("Dynamic")]
     [Range(0, 4)]                                          // b
-    public float shieldLevel = 1;
+    private float _shieldLevel = 1;
+    private GameObject lastTriggerGo = null;
 
     void Awake()
     {
         if (S == null)
         {
-            S = this; // Set the Singleton only if it’s null                  // c
+            S = this; // Set the Singleton only if itï¿½s null                  // c
         }
         else
         {
@@ -43,7 +47,58 @@ public class Hero : MonoBehaviour
 
         // Rotate the ship to make it feel more dynamic                       // e
         transform.rotation = Quaternion.Euler(vAxis * pitchMult, hAxis * rollMult, 0);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TempFire();
+        }
     }
 
-    // void Start() {…}  // Please delete the unused Start() method
+    void TempFire()
+    {                                                        // b
+        GameObject projGO = Instantiate<GameObject>(projectilePrefab);
+        projGO.transform.position = transform.position;
+        Rigidbody rigidB = projGO.GetComponent<Rigidbody>();
+        rigidB.velocity = Vector3.up * projectileSpeed;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Transform rootT = other.gameObject.transform.root;
+        GameObject go = rootT.gameObject;
+        Debug.Log("Shield trigger hit by: " + go.gameObject.name);          // b
+        print("Shield trigger hit by: " + go.gameObject.name);
+
+        // Make sure itâ€™s not the same triggering go as last time
+        if (go == lastTriggerGo) return;                                    // c
+        lastTriggerGo = go;                                                   // d
+
+        Enemy enemy = go.GetComponent<Enemy>();                               // e
+        if (enemy != null)
+        {  // If the shield was triggered by an enemy
+            shieldLevel--;        // Decrease the level of the shield by 1
+            Destroy(go);          // â€¦ and Destroy the enemy                  // f
+        }
+        else
+        {
+            Debug.LogWarning("Shield trigger hit by non-Enemy: " + go.name);    // g
+        }
+    }
+
+    public float shieldLevel
+    {
+        get { return (_shieldLevel); }                                      // b
+        private set
+        {                                                         // c
+            _shieldLevel = Mathf.Min(value, 4);                             // d
+                                                                            // If the shield is going to be set to less than zeroâ€¦
+            if (value < 0)
+            {                                                  // e
+                Destroy(this.gameObject);  // Destroy the Hero
+                Main.HERO_DIED();
+            }
+        }
+    }
+
+    // void Start() {ï¿½}  // Please delete the unused Start() method
 }
