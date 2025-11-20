@@ -49,17 +49,43 @@ public class Enemy : MonoBehaviour
 
     void OnCollisionEnter(Collision coll)
     {
-        GameObject otherGO = coll.gameObject;                                  // a
-        if (otherGO.GetComponent<ProjectileHero>() != null)
-        {                // b
-            Destroy(otherGO);      // Destroy the Projectile
-            Destroy(gameObject);   // Destroy this Enemy GameObject 
+        GameObject otherGO = coll.gameObject;
+
+        // Check for collisions with ProjectileHero
+        ProjectileHero p = otherGO.GetComponent<ProjectileHero>();
+        if (p != null)
+        {                                                    // b
+                                                             // Only damage this Enemy if it’s on screen
+            if (bndCheck.isOnScreen)
+            {                                  
+                health -= Main.GET_WEAPON_DEFINITION(p.type).damageOnHit;
+                if (health <= 0)
+                {                                          // d
+                    Destroy(this.gameObject);
+                }
+            }
+            // Destroy the ProjectileHero regardless
+            Destroy(otherGO);                                               // e
         }
         else
         {
-            Debug.Log("Enemy hit by non-ProjectileHero: " + otherGO.name);  // c
+            print("Enemy hit by non-ProjectileHero: " + otherGO.name);      // f
         }
     }
+
+    // void OnCollisionEnter(Collision coll)
+    // {
+    //     GameObject otherGO = coll.gameObject;                                  // a
+    //     if (otherGO.GetComponent<ProjectileHero>() != null)
+    //     {                // b
+    //         Destroy(otherGO);      // Destroy the Projectile
+    //         Destroy(gameObject);   // Destroy this Enemy GameObject 
+    //     }
+    //     else
+    //     {
+    //         Debug.Log("Enemy hit by non-ProjectileHero: " + otherGO.name);  // c
+    //     }
+    // }
 
     public virtual void Move()
     {

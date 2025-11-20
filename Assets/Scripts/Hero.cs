@@ -59,7 +59,7 @@ public class Hero : MonoBehaviour
         // Use the fireEvent to fire Weapons when the Spacebar is pressed.
         if (Input.GetAxis("Jump") == 1 && fireEvent != null)                 // d
         {
-            Debug.Log("Hero position when firing: " + transform.position);
+            // Debug.Log("Hero position when firing: " + transform.position);
             fireEvent();                                                      // e
         }
     }
