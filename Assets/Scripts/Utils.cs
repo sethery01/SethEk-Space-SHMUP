@@ -21,7 +21,7 @@ public class Utils : MonoBehaviour
         int r = points.Length - 1;
         for (int c = 0; c < points.Length; c++)
         {
-            vArr[r, c] = points[c];  
+            vArr[r, c] = points[c];
         }
 
         // Iterate over all remaining rows and interpolate points at each one
@@ -35,5 +35,24 @@ public class Utils : MonoBehaviour
 
         // When complete, vArr[0,0] holds the final interpolated value
         return vArr[0, 0];
+    }
+
+    //== Materials Functions =======================================================\\
+
+    /// <summary>
+    /// Returns a list of all Materials on this GameObject and its children
+    /// </summary>
+    /// <param name="go"The GameObject on which to search for Renderers</param>
+    static public Material[] GetAllMaterials(GameObject go)
+    {               // a
+        Renderer[] rends = go.GetComponentsInChildren<Renderer>();            // b
+
+        Material[] mats = new Material[rends.Length];
+        for (int i = 0; i < rends.Length; i++)
+        {                                  // c
+            mats[i] = rends[i].material;
+        }
+
+        return mats;
     }
 }
