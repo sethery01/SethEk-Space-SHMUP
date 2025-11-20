@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;   // Enables the loading & reloading of scene
 public class Main : MonoBehaviour
 {
     static private Main S;                        // A private singleton for Main
+    static private Dictionary<eWeaponType, WeaponDefinition> WEAP_DICT;
 
     [Header("Inscribed")]
     public bool spawnEnemies = true;
@@ -26,6 +27,12 @@ public class Main : MonoBehaviour
 
         // Invoke SpawnEnemy() once (in 2 seconds, based on default values)
         Invoke(nameof(SpawnEnemy), 1f / enemySpawnPerSecond);                // a
+                                                                             // A generic Dictionary with eWeaponType as the key
+        WEAP_DICT = new Dictionary<eWeaponType, WeaponDefinition>();          // a
+        foreach (WeaponDefinition def in weaponDefinitions)
+        {               // b
+            WEAP_DICT[def.type] = def;
+        }
     }
 
     public void SpawnEnemy()
@@ -78,4 +85,15 @@ public class Main : MonoBehaviour
     }
     // void Start() {…}  // Please delete the unused Start() and Update() methods
     // void Update() {…}
+
+    static public WeaponDefinition GET_WEAPON_DEFINITION(eWeaponType wt)
+    {  // a
+        if (WEAP_DICT.ContainsKey(wt))
+        {                                      // b
+            return (WEAP_DICT[wt]);
+        }
+        // If no entry of the correct type exists in WEAP_DICT, return a new 
+        //   WeaponDefinition with a type of eWeaponType.none (the default value)
+        return (new WeaponDefinition());                                     // c
+    }
 }
