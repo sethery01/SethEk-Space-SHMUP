@@ -8,10 +8,12 @@ public class Main : MonoBehaviour
     static private Main S;                        // A private singleton for Main
 
     [Header("Inscribed")]
+    public bool spawnEnemies = true;
     public GameObject[] prefabEnemies;               // Array of Enemy prefabs
     public float enemySpawnPerSecond = 0.5f;  // # Enemies spawned/second
     public float enemyInsetDefault = 1.5f;    // Inset from the sides
     public float gameRestartDelay = 2;
+    public WeaponDefinition[] weaponDefinitions;
 
     private BoundsCheck bndCheck;
 
@@ -28,6 +30,12 @@ public class Main : MonoBehaviour
 
     public void SpawnEnemy()
     {
+        // If spawnEnemies is false, skip to the next invoke of SpawnEnemy()
+        if (!spawnEnemies)
+        {                                                // c
+            Invoke(nameof(SpawnEnemy), 1f / enemySpawnPerSecond);
+            return;
+        }
         // Pick a random Enemy prefab to instantiate
         int ndx = Random.Range(0, prefabEnemies.Length);                     // b
         GameObject go = Instantiate<GameObject>(prefabEnemies[ndx]);     // c
