@@ -42,8 +42,8 @@ public class ProjectileHero : MonoBehaviour
     /// <param name="eType">The eWeaponType to use.</param>
     public void SetType(eWeaponType eType)
     {                                 // e
-        Debug.Log("Projectile rend: " + rend);
-        Debug.Log("Renderer on projectile prefab: " + GetComponent<Renderer>());
+        //Debug.Log("Projectile rend: " + rend);
+        //Debug.Log("Renderer on projectile prefab: " + GetComponent<Renderer>());
         _type = eType;
         WeaponDefinition def = Main.GET_WEAPON_DEFINITION(_type);
         rend.material.color = def.projectileColor;
