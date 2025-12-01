@@ -4,59 +4,100 @@ using UnityEngine;
 
 [RequireComponent(typeof(EnemyShield))]
 public class Enemy_4 : Enemy
-{        // Enemy_4 also extends the Enemy class
+{
+    [Header("Enemy_4 Inscribed Fields")]
+    public float duration = 4;   // Duration of interpolation movement
 
     private EnemyShield[] allShields;
     private EnemyShield thisShield;
 
+    // Movement interpolation points
+    private Vector3 p0, p1;
+    private float timeStart;
+
     void Start()
     {
-        allShields = GetComponentsInChildren<EnemyShield>();      // a
+        allShields = GetComponentsInChildren<EnemyShield>();
         thisShield = GetComponent<EnemyShield>();
-    }
 
-    public override void Move()
-    {
-        // You’ll add much more here shortly. For now, it’s easier to test if
-        // Enemy_4 doesn’t move.
+        // Set initial movement points
+        p0 = p1 = pos;
+        InitMovement();
     }
 
     /// <summary>
-    /// Enemy_4 Collisions are handled differently from other Enemy subclasses
-    /// to enable protection by EnemyShields.
+    /// Sets new movement endpoints for Enemy_4
     /// </summary>
-    /// <param name="coll"></param>
-    void OnCollisionEnter(Collision coll)
-    {                       // b
+    void InitMovement()
+    {
+        p0 = p1;   // Old endpoint becomes new start
 
+        // Assign a new random ***on-screen*** location
+        float widMinRad = bndCheck.camWidth - bndCheck.radius;
+        float hgtMinRad = bndCheck.camHeight - bndCheck.radius;
+
+        p1.x = Random.Range(-widMinRad, widMinRad);
+        p1.y = Random.Range(-hgtMinRad, hgtMinRad);
+
+        // Ensure the new point is in a different quadrant
+        if (p0.x * p1.x > 0 && p0.y * p1.y > 0)
+        {
+            if (Mathf.Abs(p0.x) > Mathf.Abs(p0.y))
+                p1.x *= -1;
+            else
+                p1.y *= -1;
+        }
+
+        timeStart = Time.time;
+    }
+
+    /// <summary>
+    /// Movement for Enemy_4 uses interpolation, not inherited Enemy.Move()
+    /// </summary>
+    public override void Move()
+    {
+        float u = (Time.time - timeStart) / duration;
+
+        // Recalculate movement path when finished
+        if (u >= 1)
+        {
+            InitMovement();
+            u = 0;
+        }
+
+        // Apply easing
+        u = u - 0.15f * Mathf.Sin(u * 2 * Mathf.PI);
+
+        // Interpolate between p0 and p1
+        pos = (1 - u) * p0 + u * p1;
+    }
+
+    /// <summary>
+    /// Collision handling for shields & damage distribution
+    /// </summary>
+    void OnCollisionEnter(Collision coll)
+    {
         GameObject otherGO = coll.gameObject;
 
-        // Make sure this was hit by a ProjectileHero
         ProjectileHero p = otherGO.GetComponent<ProjectileHero>();
         if (p != null)
         {
+            Destroy(otherGO);
 
-            // Destroy the ProjectileHero regardless of bndCheck.isOnScreen
-            Destroy(otherGO);                                     // c
-
-            // Only damage this Enemy if it’s on screen
             if (bndCheck.isOnScreen)
             {
-
-                // Find the GameObject of this Enemy_4 that was actually hit
-                GameObject hitGO = coll.contacts[0].thisCollider.gameObject;   // d
+                // Identify the hit object
+                GameObject hitGO = coll.contacts[0].thisCollider.gameObject;
                 if (hitGO == otherGO)
-                {                                        // e
                     hitGO = coll.contacts[0].otherCollider.gameObject;
-                }
 
-                // Get the damage amount from the Main WEAP_DICT
+                // Damage amount
                 float dmg = Main.GET_WEAPON_DEFINITION(p.type).damageOnHit;
 
-                // Find the EnemyShield that was hit (if there was one)
+                // Check if a shield was hit
                 bool shieldFound = false;
                 foreach (EnemyShield es in allShields)
-                {                       // f
+                {
                     if (es.gameObject == hitGO)
                     {
                         es.TakeDamage(dmg);
@@ -64,22 +105,22 @@ public class Enemy_4 : Enemy
                     }
                 }
 
-                if (!shieldFound) thisShield.TakeDamage(dmg);                  // g
+                // If no shield was hit, damage the main shield
+                if (!shieldFound)
+                    thisShield.TakeDamage(dmg);
 
-                // If thisShield is still active, then it has not been destroyed
-                if (thisShield.isActive) return;                               // h
+                // If the shield is still active, enemy survives
+                if (thisShield.isActive) return;
 
-                // This ship was destroyed so tell Main about it
+                // Otherwise notify Main and destroy
                 if (!calledShipDestroyed)
                 {
                     Main.SHIP_DESTROYED(this);
                     calledShipDestroyed = true;
                 }
 
-                // Destroy this Enemy_4
                 Destroy(gameObject);
             }
-
         }
         else
         {

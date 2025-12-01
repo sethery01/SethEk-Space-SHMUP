@@ -1217,6 +1217,7 @@ MonoBehaviour:
   health: 10
   score: 100
   powerUpDropChance: 1
+  duration: 4
 --- !u!114 &6984546667396273173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1229,8 +1230,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1fafd0b418499349a15b306a28a80e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundsType: 2
-  radius: 2.5
+  boundsType: 1
+  radius: 8
   keepOnScreen: 0
   screenLocs: 0
   camWidth: 0
