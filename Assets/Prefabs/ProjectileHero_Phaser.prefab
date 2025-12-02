@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3453999336326903008}
   - component: {fileID: 2054178686757043521}
   m_Layer: 10
-  m_Name: ProjectileHero
+  m_Name: ProjectileHero_Phaser
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,9 +147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 668314a28664d48faa17adfd617f53e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPhaser: 0
-  phaserFrequency: 15
-  phaserMagnitude: 0.5
   rigid: {fileID: 0}
   _type: 0
 --- !u!114 &2054178686757043521

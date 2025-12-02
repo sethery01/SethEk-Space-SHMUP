@@ -14,9 +14,9 @@ public enum eWeaponType
     spread,     // Multiple shots simultaneously
     phaser,     // [NI] Shots that move in waves
     missile,    // [NI] Homing missiles
-
     laser,      // [NI] Damage over time
-    shield      // Raise shieldLevel
+    shield,      // Raise shieldLevel
+    swivelGun   // A gun that swivels to aim at targets [NI]
 }
 
 /// <summary>
@@ -64,6 +64,10 @@ public class Weapon : MonoBehaviour
     private GameObject weaponModel;
     private Transform shotPointTrans;
 
+    // Added these for the laser
+    private LineRenderer laserLine;
+    private float laserLastDamageTime;
+
     void Start()
     {
         // Set up PROJECTILE_ANCHOR if it has not already been done
@@ -93,6 +97,14 @@ public class Weapon : MonoBehaviour
     public void SetType(eWeaponType wt)
     {
         _type = wt;
+
+        // Adding this if block to set up the laserLine if the weapon is a laser
+        if (_type == eWeaponType.laser)
+        {
+            laserLine = weaponModel.GetComponent<LineRenderer>();
+            laserLine.enabled = false;
+        }
+
 
         if (type == eWeaponType.none)
         {
@@ -147,6 +159,23 @@ public class Weapon : MonoBehaviour
                 p.transform.rotation = Quaternion.AngleAxis(-10, Vector3.back);
                 p.vel = p.transform.rotation * vel;
                 break;
+
+            case eWeaponType.phaser:
+                ProjectileHero p1 = MakeProjectile();
+                ProjectileHero p2 = MakeProjectile();
+                p1.vel = vel;
+                p2.vel = vel;
+                Vector3 left = shotPointTrans.right * -0.5f;
+                Vector3 right = shotPointTrans.right * 0.5f;
+                p1.transform.position += left;
+                p2.transform.position += right;
+                p1.isPhaser = true;
+                p2.isPhaser = true;
+                break;
+
+            // case eWeaponType.laser:
+            //     FireLaser();
+            //     break;
         }
     }
 
@@ -166,4 +195,5 @@ public class Weapon : MonoBehaviour
         nextShotTime = Time.time + def.delayBetweenShots;
         return p;
     }
+
 }

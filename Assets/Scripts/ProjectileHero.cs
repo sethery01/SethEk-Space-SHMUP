@@ -7,6 +7,12 @@ public class ProjectileHero : MonoBehaviour
 {
     private BoundsCheck bndCheck;
     private Renderer rend;
+    public bool isPhaser = false;
+    public float phaserFrequency = 8f;
+    public float phaserMagnitude = .5f;
+    private float birthTime;
+    private float birthStartY;
+
 
     [Header("Dynamic")]
     public Rigidbody rigid;
@@ -27,13 +33,33 @@ public class ProjectileHero : MonoBehaviour
         rigid = GetComponent<Rigidbody>();
     }
 
+    // I'm adding this to track when the projectile was created. For phasers.
+    void Start()
+    {
+        birthTime = Time.time;
+        birthStartY = transform.position.y;
+    }
+
+
     void Update()
     {
+        // Phaser movement
+        if (isPhaser)
+        {
+            Vector3 pos = transform.position;
+            pos += rigid.velocity * Time.deltaTime;
+            float distance = pos.y - birthStartY;
+            float sin = Mathf.Sin(distance * phaserFrequency);
+            pos.x += sin * phaserMagnitude;
+            transform.position = pos;
+        }
+
         if (bndCheck.LocIs(BoundsCheck.eScreenLocs.offUp))
         {
             Destroy(gameObject);
         }
     }
+
 
     /// <summary>
     /// Sets the _type private field and colors this projectile to match the 
@@ -58,30 +84,3 @@ public class ProjectileHero : MonoBehaviour
         set { rigid.velocity = value; }
     }
 }
-
-
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-
-// [RequireComponent(typeof(BoundsCheck))]
-// public class ProjectileHero : MonoBehaviour
-// {
-//     private BoundsCheck bndCheck;
-
-//     void Awake()
-//     {
-//         bndCheck = GetComponent<BoundsCheck>();
-//     }
-
-//     void Update()
-//     {
-//         if (bndCheck.LocIs(BoundsCheck.eScreenLocs.offUp))
-//         {          // a
-//             Destroy(gameObject);
-//         }
-//     }
-
-//     // void Start() {…}  // Please delete the unused Start() method
-// }
-

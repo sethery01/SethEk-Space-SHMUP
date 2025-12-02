@@ -784,8 +784,18 @@ MonoBehaviour:
     damagePerSec: 0
     delayBetweenShots: 0
     velocity: 0
+  - type: 3
+    letter: P
+    powerUpColor: {r: 1, g: 0.09935137, b: 0, a: 1}
+    weaponModelPrefab: {fileID: 919132149155446097, guid: 2b917555367b8f64fab39ba6974870f3, type: 3}
+    projectilePrefab: {fileID: 1203334100953142008, guid: bb1d61268b2db824cbcb332549662bae, type: 3}
+    projectileColor: {r: 1, g: 0.18613334, b: 0, a: 1}
+    damageOnHit: 0.5
+    damagePerSec: 0
+    delayBetweenShots: 0.2
+    velocity: 50
   prefabPowerUp: {fileID: 3967352958319005553, guid: 5a97c2ccee1bdd64a92688cdd09403bc, type: 3}
-  powerUpFrequency: 01000000010000000200000006000000
+  powerUpFrequency: 01000000030000000200000006000000
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
